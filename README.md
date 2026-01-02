@@ -3,13 +3,13 @@
 *An educational Python project to practice Clean Code principles.*
 
 <p align="left">
-  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="version" />
+  <img src="https://img.shields.io/badge/version-1.0.1-blue" alt="version" />
   <img src="https://img.shields.io/badge/python-%3E%3D3.10-3776AB?logo=python&logoColor=white" alt="python" />
   <img src="https://img.shields.io/badge/license-MIT-green" alt="license" />
   <img src="https://img.shields.io/badge/status-educational-success" alt="status" />
 </p>
 
-- **Version**: 1.0.0  
+- **Version**: 1.0.1  
 - **Status**: Educational / Learning Project  
 - **License**: MIT  
 - **Python Version**: >= 3.10  
