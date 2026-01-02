@@ -60,7 +60,15 @@ L’objectif principal est de **respecter les bonnes pratiques Python** :
 clean-code-python/
 │
 ├── main.py
-├── utils.py
+├── features/
+│   ├── name_checker.py
+│   └── age_checker.py
+├── tests/
+│   ├── test.py
+│   ├── test_name_checker.py
+│   └── test_age_checker.py
+├── requirements.txt
+├── .gitignore
 └── README.md
 ```
 
@@ -163,7 +171,6 @@ The main goal is to **apply Python Clean Code principles**.
 
 ### Features
 - Name validation (non-empty, alphabetic)
-- Name validation (non-empty, alphabetic)
 - Date of birth validation (formats: `YYYY-MM-DD` or `DD/MM/YYYY`)
 - Automatic age calculation (must be between 16 and 70 years inclusive)
 - Clear and formatted output
@@ -175,7 +182,15 @@ The main goal is to **apply Python Clean Code principles**.
 clean-code-python/
 │
 ├── main.py
-├── utils.py
+├── features/
+│   ├── name_checker.py
+│   └── age_checker.py
+├── tests/
+│   ├── test.py
+│   ├── test_name_checker.py
+│   └── test_age_checker.py
+├── requirements.txt
+├── .gitignore
 └── README.md
 ```
 
