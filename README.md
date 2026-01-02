@@ -113,6 +113,25 @@ def calculate_birth_year(age: int, current_year: int) -> int:
 python main.py
 ```
 
+### Setup et tests
+
+Pour installer les dépendances de développement et exécuter les tests :
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+python3 tests/test.py
+```
+
+Si vous ne souhaitez pas utiliser un environnement virtuel :
+
+```bash
+python3 -m pip install --user -r requirements.txt
+python3 tests/test.py
+```
+
 ---
 
 ### Objectif pédagogique
@@ -207,6 +226,25 @@ def calculate_birth_year(age: int, current_year: int) -> int:
 ### Run the Program
 ```bash
 python main.py
+```
+
+### Setup and tests
+
+To install development dependencies and run the test suite:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+python3 tests/test.py
+```
+
+If you prefer not to use a virtual environment:
+
+```bash
+python3 -m pip install --user -r requirements.txt
+python3 tests/test.py
 ```
 
 ---
