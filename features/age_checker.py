@@ -1,8 +1,9 @@
-"""Age validation and utility functions.
+"""Age validation and utilities based on date of birth.
 
-Provides `AgeChecker` that validates user-provided ages according
-to project README rules (integer between 0 and 70 inclusive) and
-can compute an estimated birth year given the current year.
+The application requests a date of birth (DOB) from the user and
+derives the age. Validation enforces a minimum age of 16 and a
+maximum age of 70 (inclusive). This module provides parsing,
+age calculation and clear error types.
 """
 from __future__ import annotations
 
@@ -11,77 +12,93 @@ import datetime
 
 
 class AgeValidationError(ValueError):
-    """Raised when an age does not meet validation rules."""
+    """Raised when a date of birth does not meet validation rules."""
 
 
 class AgeChecker:
-    """Validate ages and compute birth years.
+    """Validate date of birth and compute age and birth year.
 
-    Usage:
-        AgeChecker.validate("25") -> 25
-        AgeChecker.birth_year(25) -> 2000  # if current year is 2025
+    Public methods:
+    - `parse_dob(value)` -> datetime.date: parse and validate input format
+    - `age_from_dob(dob)` -> int: compute age in years
+    - `validate_dob(value)` -> int: parse and return age, raising on invalid
+    - `is_valid(value)` -> (bool, message)
     """
 
     MIN_AGE = 16
     MAX_AGE = 70
 
+    _FORMATS = (
+        "%Y-%m-%d",  # 2020-01-31 (ISO)
+        "%d/%m/%Y",  # 31/01/2020
+        "%d-%m-%Y",  # 31-01-2020
+    )
+
     @classmethod
-    def validate(cls, age_value) -> int:
-        """Validate and convert an age input to an integer.
+    def parse_dob(cls, value) -> datetime.date:
+        """Parse a date-of-birth value into a `datetime.date`.
 
-        Accepts strings or numbers. Raises `AgeValidationError` for
-        invalid values and `TypeError` when the input type is
-        unsupported.
-
-        :param age_value: value to validate
-        :return: integer age between MIN_AGE and MAX_AGE inclusive
+        Accepts a `datetime.date` or a string in one of the supported
+        formats. Raises `AgeValidationError` or `TypeError` on bad input.
         """
-        if isinstance(age_value, bool):
-            # bool is subclass of int, but not valid age input
-            raise TypeError("age must be an integer between 0 and 70")
+        if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
+            return value
 
-        # Convert from string if necessary
-        if isinstance(age_value, str):
-            age_value = age_value.strip()
-            if not age_value:
-                raise AgeValidationError("age must not be empty")
-            if not age_value.lstrip("+-").isdigit():
-                raise AgeValidationError("age must be an integer")
+        if not isinstance(value, str):
+            raise TypeError("date of birth must be a string or date")
+
+        text = value.strip()
+        if not text:
+            raise AgeValidationError("date of birth must not be empty")
+
+        for fmt in cls._FORMATS:
             try:
-                age = int(age_value)
+                return datetime.datetime.strptime(text, fmt).date()
             except ValueError:
-                raise AgeValidationError("age must be an integer")
-        elif isinstance(age_value, int):
-            age = age_value
-        else:
-            # allow numeric types convertible to int (e.g., float with .0)
-            if isinstance(age_value, float) and age_value.is_integer():
-                age = int(age_value)
-            else:
-                raise TypeError("age must be an integer or string representing an integer")
+                continue
 
+        raise AgeValidationError("date of birth must be in YYYY-MM-DD or DD/MM/YYYY format")
+
+    @staticmethod
+    def age_from_dob(dob: datetime.date, on_date: datetime.date | None = None) -> int:
+        """Compute the age in years given a birth date.
+
+        Accounts for whether the birthday has occurred yet in the
+        reference year.
+        """
+        if on_date is None:
+            on_date = datetime.date.today()
+        years = on_date.year - dob.year
+        if (on_date.month, on_date.day) < (dob.month, dob.day):
+            years -= 1
+        return years
+
+    @classmethod
+    def validate_dob(cls, value) -> int:
+        """Parse `value` as DOB and return computed age.
+
+        Raises `AgeValidationError` when the resulting age is outside
+        allowed bounds.
+        """
+        dob = cls.parse_dob(value)
+        age = cls.age_from_dob(dob)
         if age < cls.MIN_AGE or age > cls.MAX_AGE:
-            raise AgeValidationError(f"age must be between {cls.MIN_AGE} and {cls.MAX_AGE} inclusive")
-
+            raise AgeValidationError(f"age must be between {cls.MIN_AGE} and {cls.MAX_AGE} years")
         return age
 
     @classmethod
-    def is_valid(cls, age_value) -> Tuple[bool, str]:
-        """Return (True, '') if valid, else (False, message)."""
+    def is_valid(cls, value) -> Tuple[bool, str]:
+        """Return (True, '') if DOB is valid and age within bounds.
+
+        Otherwise returns (False, message).
+        """
         try:
-            cls.validate(age_value)
+            cls.validate_dob(value)
             return True, ""
         except Exception as exc:
             return False, str(exc)
 
     @staticmethod
-    def birth_year(age: int, current_year: int | None = None) -> int:
-        """Compute an estimated birth year from age.
-
-        :param age: validated integer age
-        :param current_year: if None, uses the current calendar year
-        :return: estimated birth year
-        """
-        if current_year is None:
-            current_year = datetime.date.today().year
-        return current_year - age
+    def birth_year_from_dob(dob: datetime.date) -> int:
+        """Return the birth year extracted from the date of birth."""
+        return dob.year

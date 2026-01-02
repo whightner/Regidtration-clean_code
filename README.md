@@ -31,8 +31,8 @@ Ce projet est un **exercice simple de pratique du Clean Code en Python**.
 Il consiste à écrire un programme qui :
 
 - Demande le **nom** de l’utilisateur (valide)
-- Demande son **âge** (valide, maximum 70 ans)
-- Calcule sa **date de naissance**
+- Demande sa **date de naissance** (valide)
+- Calcule automatiquement son **âge**
 - Affiche :
   - son **nom**
   - son **âge**
@@ -49,8 +49,8 @@ L’objectif principal est de **respecter les bonnes pratiques Python** :
 
 ### Fonctionnalités
 - Validation du nom (non vide, alphabétique)
-- Validation de l’âge (entier positif ≤ 70)
-- Calcul automatique de l’année de naissance
+- Validation de la date de naissance (format attendu : YYYY-MM-DD ou DD/MM/YYYY)
+- Calcul automatique de l'âge (doit être entre 16 et 70 ans inclus)
 - Affichage clair et formaté des résultats
 
 ---
@@ -79,9 +79,9 @@ Année de naissance : 1999
 - **Nom** :  
   - non vide  
   - uniquement des lettres  
-- **Âge** :  
-  - nombre entier  
-  - compris entre 0 et 70 inclus  
+- **Date de naissance** :  
+  - format `YYYY-MM-DD` ou `DD/MM/YYYY`  
+  - l'âge calculé doit être compris entre 16 et 70 ans inclus  
 
 ---
 
@@ -131,8 +131,8 @@ This project is a **simple Clean Code practice exercise in Python**.
 The program:
 
 - Asks the user for their **name** (valid)
-- Asks for their **age** (valid, maximum 70)
-- Calculates the **birth year**
+- Asks for their **date of birth** (valid)
+- Calculates the user's **age** from the provided DOB
 - Displays:
   - user's **name**
   - **age**
@@ -144,8 +144,9 @@ The main goal is to **apply Python Clean Code principles**.
 
 ### Features
 - Name validation (non-empty, alphabetic)
-- Age validation (positive integer ≤ 70)
-- Automatic birth year calculation
+- Name validation (non-empty, alphabetic)
+- Date of birth validation (formats: `YYYY-MM-DD` or `DD/MM/YYYY`)
+- Automatic age calculation (must be between 16 and 70 years inclusive)
 - Clear and formatted output
 
 ---
@@ -174,9 +175,9 @@ Birth year: 1999
 - **Name**:
   - must not be empty
   - letters only
-- **Age**:
-  - integer
-  - between 0 and 70 inclusive
+- **Date of birth**:
+  - must be provided in `YYYY-MM-DD` or `DD/MM/YYYY` format
+  - computed age must be between 16 and 70 inclusive
 
 ---
 
