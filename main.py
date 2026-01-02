@@ -1,112 +1,95 @@
-from datetime import date, datetime
-import re
-from enum import Enum
+"""Console entry point for the Clean Code practice application.
 
-# CONFIGURATION
+This script prompts the user for their name and date of birth,
+validates the inputs using `features.name_checker.NameChecker` and
+`features.age_checker.AgeChecker`, computes the age, and prints a
+clean, formatted summary.
 
-MAX_NAME_LENGTH = 120
-MAX_ALLOWED_AGE = 50
+The script performs robust error handling and keeps user prompts
+simple for clarity and testing.
+"""
+from __future__ import annotations
 
+from datetime import date
+import sys
 
-# SYSTEM STATES
-
-class SystemState(Enum):
-    START = 1
-    GET_NAME = 2
-    GET_DOB = 3
-    PROCESS = 4
-    END = 5
-
-
-# NAME TASK
-
-def name_is_valid(name: str) -> bool:
-    if not name:
-        return False
-
-    if len(name) > MAX_NAME_LENGTH:
-        return False
-
-    if not re.fullmatch(r"[A-Za-z ]+", name):
-        return False
-
-    words = name.strip().split()
-
-    for word in words:
-        if len(word) < 2:
-            return False
-        if not re.search(r"[aeiouAEIOU]", word):
-            return False
-
-    return True
+from features.name_checker import NameChecker, NameValidationError
+from features.age_checker import AgeChecker, AgeValidationError
 
 
-def name_task() -> str:
-    while True:
-        name = input("Enter full name: ").strip()
-        if name_is_valid(name):
-            return name
-        print("Invalid name. Letters only, realistic name required.")
+def prompt_loop(prompt: str) -> str:
+	"""Prompt repeatedly until receiving a non-empty response.
+
+	Returns the raw input string (not validated).
+	"""
+	while True:
+		try:
+			value = input(prompt).strip()
+		except (KeyboardInterrupt, EOFError):
+			print("\nInput cancelled. Exiting.")
+			raise SystemExit(1)
+
+		if value:
+			return value
+		print("Input must not be empty. Please try again.")
 
 
-# DATE OF BIRTH TASK
+def get_valid_name() -> str:
+	"""Prompt the user until a valid name is provided.
 
-def calculate_age(dob: date) -> int:
-    today = date.today()
-    age = today.year - dob.year
-
-    if (today.month, today.day) < (dob.month, dob.day):
-        age -= 1
-
-    return age
-
-
-def dob_task() -> date:
-    while True:
-        dob_input = input("Enter DOB (YYYY-MM-DD): ").strip()
-        try:
-            dob = datetime.strptime(dob_input, "%Y-%m-%d").date()
-            age = calculate_age(dob)
-
-            if 0 < age <= MAX_ALLOWED_AGE:
-                return dob
-
-            print("Age must be 50 or below.")
-        except ValueError:
-            print("Invalid date format.")
+	Uses `NameChecker.validate` which returns a normalized name.
+	"""
+	while True:
+		raw = prompt_loop("Enter your name: ")
+		try:
+			return NameChecker.validate(raw)
+		except (NameValidationError, TypeError) as exc:
+			print(f"Invalid name: {exc}")
 
 
-# APPLICATION 
+def get_valid_dob() -> date:
+	"""Prompt the user until a valid date of birth is provided.
 
-def app():
-    state = SystemState.START
-    name = None
-    dob = None
-    age = None
-
-    while state != SystemState.END:
-
-        if state == SystemState.START:
-            print("=== User Registration System ===")
-            state = SystemState.GET_NAME
-
-        elif state == SystemState.GET_NAME:
-            name = name_task()
-            state = SystemState.GET_DOB
-
-        elif state == SystemState.GET_DOB:
-            dob = dob_task()
-            state = SystemState.PROCESS
-
-        elif state == SystemState.PROCESS:
-            age = calculate_age(dob)
-            print("\nRegistration Successful")
-            print(f"Name : {name}")
-            print(f"Age  : {age}")
-            state = SystemState.END
+	Returns a `datetime.date` object for the parsed DOB. The function
+	enforces the age bounds defined in `AgeChecker`.
+	"""
+	while True:
+		raw = prompt_loop("Enter your date of birth (YYYY-MM-DD or DD/MM/YYYY): ")
+		try:
+			dob = AgeChecker.parse_dob(raw)
+			# compute age and check bounds explicitly to provide friendly messages
+			age = AgeChecker.age_from_dob(dob)
+			if age < AgeChecker.MIN_AGE or age > AgeChecker.MAX_AGE:
+				raise AgeValidationError(f"age must be between {AgeChecker.MIN_AGE} and {AgeChecker.MAX_AGE} years; computed {age}")
+			return dob
+		except (AgeValidationError, TypeError) as exc:
+			print(f"Invalid date of birth: {exc}")
 
 
-# ENTRY POINT
+def display_summary(name: str, dob: date) -> None:
+	"""Print a concise summary with name, age and birth year."""
+	age = AgeChecker.age_from_dob(dob)
+	birth_year = AgeChecker.birth_year_from_dob(dob)
+	print()
+	print(f"Name: {name}")
+	print(f"Age: {age} years")
+	print(f"Birth year: {birth_year}")
+
+
+def main() -> int:
+	"""Run the interactive prompt sequence and display results.
+
+	Return exit code 0 on success, non-zero on user cancellation.
+	"""
+	try:
+		name = get_valid_name()
+		dob = get_valid_dob()
+	except SystemExit:
+		return 1
+
+	display_summary(name, dob)
+	return 0
+
 
 if __name__ == "__main__":
-    app()
+	raise SystemExit(main())
