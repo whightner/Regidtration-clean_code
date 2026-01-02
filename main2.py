@@ -19,6 +19,7 @@ class SystemState(Enum):
 # NAME VALIDATION TASK
 
 def name_is_valid(name: str) -> bool:
+
     if not name:
         return False
 
@@ -36,37 +37,24 @@ def name_is_valid(name: str) -> bool:
         if not re.search(r"[aeiouAEIOU]", word):
             return False
 
+  # Suspicious pattern checks
+    vowels = sum(1 for c in word.lower() if c in "aeiou")
+    consonants = sum(1 for c in word.lower() if c.isalpha() and c not in "aeiou")
+    if consonants > vowels * 3:  # too many consonants
+       return False
+    if len(set(word)) < len(word) // 2:  # too many repeated letters
+        return False
+
     return True
 
-def suspicious_name_check(name: str) -> bool:
-    words = name.lower().split()
-    for word in words:
-        vowels = sum(1 for c in word if c in "aeiou")
-        consonants = sum(1 for c in word if c.isalpha() and c not in "aeiou")
-
-        # Too many consonants compared to vowels
-        if consonants > vowels * 3:
-            return True
-
-        # Too many repeated letters
-        if len(set(word)) < len(word) // 2:
-            return True
-
-    return False
+# NAME TASK
 
 def name_task() -> str:
     while True:
         name = input("Enter full name: ").strip()
-
-        if not name_is_valid(name):
-            print("Invalid name format. Letters only, realistic name required.")
-            continue
-
-        if suspicious_name_check(name):
-            print("Suspicious name detected. Please enter a valid name.")
-            continue
-
-        return name
+        if name_is_valid(name):
+            return name
+        print("Invalid name. Letters only, realistic name required.")
 
 # DATE OF BIRTH TASK
 
